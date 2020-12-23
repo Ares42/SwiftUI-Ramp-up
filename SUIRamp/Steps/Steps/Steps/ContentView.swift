@@ -12,12 +12,14 @@ import HealthKit
 struct ContentView: View {
   @Environment(\.managedObjectContext) private var viewContext
   
-  @FetchRequest(
-    entity: Steps.entity(),
-    sortDescriptors: []
-  )
+//  @FetchRequest(
+//    entity: Steps.entity(),
+//    sortDescriptors: []
+//  )
   
-  var steps: FetchedResults<Steps>
+//  var steps: FetchedResults<Steps>
+  
+  @State private var steps = [Step]()
   
   private var healthDataManager:HealthDataManager?
   
@@ -32,9 +34,9 @@ struct ContentView: View {
     List {
       ForEach(steps) { step in
         HStack{
-          Text("\(step.date!, formatter: Self.dateFormatter):")
+          Text("\(step.date, formatter: Self.dateFormatter):")
             .fontWeight(.bold)
-          Text("\(step.count)")
+          Text("\(step.step)")
             .font(.caption)
         }
         .padding()
@@ -44,12 +46,19 @@ struct ContentView: View {
       if let healthDataManager = healthDataManager {
         healthDataManager.requestAuthorization { success in
           if success {
-            healthDataManager.calculateSteps { statisticsCollection in
-              if let statisticsCollection = statisticsCollection {
-                // update the UI
-                updateUIFromStatistics(statisticsCollection)
+            healthDataManager.fetchStepArray { response in
+              if case .success(let stepsResonse) = response {
+                steps = stepsResonse
+              } else if case .failure(_) = response {
+                print()
               }
             }
+            
+//            healthDataManager.calculateSteps { statisticsCollection in
+//              if let statisticsCollection = statisticsCollection {
+//                updateUIFromStatistics(statisticsCollection)
+//              }
+//            }
           }
         }
       }
@@ -62,29 +71,21 @@ struct ContentView: View {
     healthDataManager = HealthDataManager()
   }
   
-  private func updateUIFromStatistics(_ statisticsCollection: HKStatisticsCollection) {
-    let startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-    let endDate = Date()
-    
-    statisticsCollection.enumerateStatistics(from: startDate, to: endDate) { (statistics, stop) in
-      let newStep = Steps(context: viewContext)
-      let count = statistics.sumQuantity()?.doubleValue(for: .count())
-      newStep.count = Int64(count ?? 0)
-      newStep.date = statistics.startDate
-    }
-    
-    saveContext()
-  }
+//  private func updateUIFromStatistics(_ statisticsCollection: HKStatisticsCollection) {
+//    let startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+//    let endDate = Date()
+//
+//    statisticsCollection.enumerateStatistics(from: startDate, to: endDate) { (statistics, stop) in
+//      guard let newStep = NSEntityDescription.insertNewObject(forEntityName: "Steps", into: viewContext) as? Steps else { return }
+//      let count = statistics.sumQuantity()?.doubleValue(for: .count())
+//      newStep.count = Int64(count ?? 0)
+//      newStep.date = statistics.startDate
+//    }
+//
+//    saveContext()
+//  }
   
-  func saveContext() {
-    if viewContext.hasChanges {
-      do {
-        try viewContext.save()
-      } catch {
-        print("Error saving managed object context: \(error)")
-      }
-    }
-  }
+
 }
 
 struct ContentView_Previews: PreviewProvider {

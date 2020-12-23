@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import HealthKit
 
 class PersistenceController {
   static let shared = PersistenceController()
@@ -92,4 +93,40 @@ class PersistenceController {
     }
   }
   
+  // =================================================================================
+  //                                 MARK: - Fetch
+  // =================================================================================
+
+  func fetchSteps(completion: @escaping (Result<[Steps], Error>) -> Void) {
+    let fetchRequest = NSFetchRequest<Steps>(entityName: "Steps")
+    
+    do {
+      let steps = try container.viewContext.fetch(fetchRequest)
+      let sortedSteps = steps.sorted { (s1, s2) in
+        s1.date! < s2.date!
+      }
+      completion(.success(sortedSteps))
+    } catch let error as NSError {
+      print("CoreData: could not fetch steps - \(error) \(error.userInfo)")
+      completion(.failure(error))
+    }
+  }
+  
+  func insertSteps(statistics:HKStatistics) {
+    guard let newStepEntity = NSEntityDescription.insertNewObject(forEntityName: "Steps", into: container.viewContext) as? Steps else { return }
+    let count = statistics.sumQuantity()?.doubleValue(for: .count())
+    newStepEntity.count = Int64(count ?? 0)
+    newStepEntity.date = statistics.startDate
+    saveContext()
+  }
+  
+  func saveContext() {
+    if container.viewContext.hasChanges {
+      do {
+        try container.viewContext.save()
+      } catch {
+        print("Error saving managed object context: \(error)")
+      }
+    }
+  }
 }

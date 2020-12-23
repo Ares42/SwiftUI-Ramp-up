@@ -102,6 +102,9 @@ class PersistenceController {
     
     do {
       let steps = try container.viewContext.fetch(fetchRequest)
+      if steps.count == 0 {
+        completion(.failure(NSError()))
+      }
       let sortedSteps = steps.sorted { (s1, s2) in
         s1.date! < s2.date!
       }

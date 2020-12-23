@@ -62,7 +62,6 @@ class HealthDataManager {
   }
   
   func fetchStepArray(completion: @escaping(Result<[Step], HealthError>)->()) {
-    
     var result = [Step]()
     
     PersistenceController.shared.fetchSteps { [weak self] (response) in
@@ -70,8 +69,8 @@ class HealthDataManager {
         for (i, step) in steps.enumerated() {
           let newStep = Step(id: i, step: Int(step.count), date: step.date!)
           result.append(newStep)
-          completion(.success(result))
         }
+        completion(.success(result))
       } else if case .failure(_) = response {
         self?.calculateSteps { (response) in
           if case .success(let statisticsCollection) = response {

@@ -50,7 +50,7 @@ struct ContentView: View {
               if case .success(let stepsResonse) = response {
                 steps = stepsResonse
               } else if case .failure(_) = response {
-                print()
+                print("failure fetching steps")
               }
             }
             

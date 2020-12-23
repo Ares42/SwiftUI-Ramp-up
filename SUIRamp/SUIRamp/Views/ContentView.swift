@@ -37,7 +37,7 @@ struct ContentView: View {
     private func addItem() {
         withAnimation {
           let newLandmark = ManagedLandmark(context: viewContext)
-          newLandmark.id = Int64(landmarks.count)
+          newLandmark.id = landmarks.count
 
             do {
                 try viewContext.save()

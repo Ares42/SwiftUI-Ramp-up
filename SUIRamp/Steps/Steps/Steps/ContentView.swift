@@ -11,18 +11,9 @@ import HealthKit
 
 struct ContentView: View {
   @Environment(\.managedObjectContext) private var viewContext
-  
-//  @FetchRequest(
-//    entity: Steps.entity(),
-//    sortDescriptors: []
-//  )
-  
-//  var steps: FetchedResults<Steps>
-  
   @State private var steps = [Step]()
   
   private var healthDataManager:HealthDataManager?
-  
   static let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "MMMM dd"
@@ -53,12 +44,6 @@ struct ContentView: View {
                 print("failure fetching steps")
               }
             }
-            
-//            healthDataManager.calculateSteps { statisticsCollection in
-//              if let statisticsCollection = statisticsCollection {
-//                updateUIFromStatistics(statisticsCollection)
-//              }
-//            }
           }
         }
       }
@@ -70,21 +55,6 @@ struct ContentView: View {
   init() {
     healthDataManager = HealthDataManager()
   }
-  
-//  private func updateUIFromStatistics(_ statisticsCollection: HKStatisticsCollection) {
-//    let startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-//    let endDate = Date()
-//
-//    statisticsCollection.enumerateStatistics(from: startDate, to: endDate) { (statistics, stop) in
-//      guard let newStep = NSEntityDescription.insertNewObject(forEntityName: "Steps", into: viewContext) as? Steps else { return }
-//      let count = statistics.sumQuantity()?.doubleValue(for: .count())
-//      newStep.count = Int64(count ?? 0)
-//      newStep.date = statistics.startDate
-//    }
-//
-//    saveContext()
-//  }
-  
 
 }
 

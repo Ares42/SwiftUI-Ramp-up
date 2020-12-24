@@ -81,7 +81,6 @@ class HealthDataManager {
             var i = 0
             statisticsCollection?.enumerateStatistics(from: startDate, to: endDate) { (statistics, stop) in
               PersistenceController.shared.insertSteps(statistics: statistics)
-              
               let count = Int(statistics.sumQuantity()?.doubleValue(for: .count()) ?? 0)
               let newStep = Step(id: i, step: count, date: statistics.startDate)
               i += 1
@@ -97,9 +96,6 @@ class HealthDataManager {
         completion(.failure(.fetchFailed))
       }
     }
-    
-    
-    
   }
   
 }
